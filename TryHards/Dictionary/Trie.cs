@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
 
 namespace TryHards.Dictionary
 {
   public class Trie<Letter>
   {
-    bool IsWord;
+    internal bool IsWord;
 
-    Dictionary<Letter, Trie<Letter>> Edges;
+    internal Dictionary<Letter, Trie<Letter>> Edges;
 
-    public Trie()
-    {
-
-    }
+    public Trie() { }
 
     public void Insert(ReadOnlySpan<Letter> word)
     {
@@ -37,7 +33,7 @@ namespace TryHards.Dictionary
       current.IsWord = true;
     }
 
-    Trie<Letter> FindWordLeafNode(ReadOnlySpan<Letter> word)
+    internal Trie<Letter> FindWordLeafNode(ReadOnlySpan<Letter> word)
     {
       var current = this;
       foreach (var letter in word)
@@ -69,6 +65,48 @@ namespace TryHards.Dictionary
       }
 
       return (i - 1, current);
+    }
+
+    public IEnumerable<Letter[]> GetLetterArrayEnumerable()
+    {
+      Letter[] Collector(List<Letter> wordBuffer)
+      {
+        return wordBuffer.ToArray();
+      }
+
+      EnumeratorWrapper<Letter[]> wrapper = new EnumeratorWrapper<Letter[]>
+      {
+        Buffer = new(),
+        Collector = Collector
+      };
+
+      return wrapper.GetWordEnumeratorInternal(this);
+    }
+
+    internal struct EnumeratorWrapper<Word>
+    {
+      internal List<Letter> Buffer;
+      internal Func<List<Letter>, Word> Collector;
+
+      internal IEnumerable<Word> GetWordEnumeratorInternal(Trie<Letter> trie)
+      {
+        var edges = trie.Edges;
+        if (edges == null)
+          yield break;
+
+        if (trie.IsWord)
+          yield return Collector(Buffer);
+
+        foreach (var kvp in edges)
+        {
+          Buffer.Add(kvp.Key);
+
+          foreach (var word in GetWordEnumeratorInternal(kvp.Value))
+            yield return word;
+
+          Buffer.RemoveAt(Buffer.Count - 1);
+        }
+      }
     }
   }
 }
