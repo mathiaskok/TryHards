@@ -22,6 +22,8 @@
 !MSBuild.rsp
 !Directory.Build.rsp
 
+.vscode/
+
 # Visual Studio 14+ cache/options directory
 .vs/
 
