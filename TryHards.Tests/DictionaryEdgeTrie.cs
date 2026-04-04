@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TryHards.Dictionary;
+using TryHards.Trie;
 
 namespace TryHards.Tests
 {
   [TestFixture]
-  public class TrieContains
+  public class DictionaryEdgeTrieContains
   {
     public class TestSet
     {
@@ -24,7 +24,7 @@ namespace TryHards.Tests
 
     public void TestBase(TestSet test)
     {
-      Trie<char> trie = new();
+      DictionaryEdgeTrie<char> trie = new();
 
       foreach (var pattern in test.Patterns)
         trie.Insert(pattern.AsMemory().Span);

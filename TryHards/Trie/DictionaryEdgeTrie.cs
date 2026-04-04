@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TryHards.Dictionary
+namespace TryHards.Trie
 {
-  public class Trie<Letter>
+  public class DictionaryEdgeTrie<Letter>
   {
     internal bool IsWord;
 
-    internal Dictionary<Letter, Trie<Letter>> Edges;
+    internal Dictionary<Letter, DictionaryEdgeTrie<Letter>> Edges;
 
-    public Trie() { }
+    public DictionaryEdgeTrie() { }
 
     public void Insert(ReadOnlySpan<Letter> word)
     {
@@ -18,12 +18,12 @@ namespace TryHards.Dictionary
       foreach (var letter in word)
       {
         if (current.Edges == null)
-          current.Edges = new Dictionary<Letter, Trie<Letter>>();
+          current.Edges = new Dictionary<Letter, DictionaryEdgeTrie<Letter>>();
 
         if (!current.Edges.TryGetValue(letter, out var next))
         {
           // This branch could be made faster as we now know that the remaining postfix is missing.
-          next = new Trie<Letter>();
+          next = new DictionaryEdgeTrie<Letter>();
           current.Edges.Add(letter, next);
         }
 
@@ -33,7 +33,7 @@ namespace TryHards.Dictionary
       current.IsWord = true;
     }
 
-    internal Trie<Letter> FindWordLeafNode(ReadOnlySpan<Letter> word)
+    internal DictionaryEdgeTrie<Letter> FindWordLeafNode(ReadOnlySpan<Letter> word)
     {
       var current = this;
       foreach (var letter in word)
@@ -51,7 +51,7 @@ namespace TryHards.Dictionary
       return node != null && node.IsWord;
     }
 
-    public (int index, Trie<Letter> node) FindLongestPrefix(ReadOnlySpan<Letter> word)
+    public (int index, DictionaryEdgeTrie<Letter> node) FindLongestPrefix(ReadOnlySpan<Letter> word)
     {
       var current = this;
       int i = 0;
@@ -88,7 +88,7 @@ namespace TryHards.Dictionary
       internal List<Letter> Buffer;
       internal Func<List<Letter>, Word> Collector;
 
-      internal IEnumerable<Word> GetWordEnumeratorInternal(Trie<Letter> trie)
+      internal IEnumerable<Word> GetWordEnumeratorInternal(DictionaryEdgeTrie<Letter> trie)
       {
         var edges = trie.Edges;
         if (edges == null)
