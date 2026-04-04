@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace TryHards.AhoCorasick
 {
-  public class Trie<Letter>
+  public class AhoCorasickAutomaton<Letter>
   {
-    internal Dictionary<Letter, Trie<Letter>> Next;
+    internal Dictionary<Letter, AhoCorasickAutomaton<Letter>> Next;
 
-    internal Trie<Letter> _fail;
-    internal Trie<Letter> Fail
+    internal AhoCorasickAutomaton<Letter> _fail;
+    internal AhoCorasickAutomaton<Letter> Fail
     {
       get => _fail;
       set => _fail = value ?? _fail;
@@ -18,20 +18,20 @@ namespace TryHards.AhoCorasick
 
     internal List<ReadOnlyMemory<Letter>> Output;
 
-    internal Trie(Trie<Letter> root)
+    internal AhoCorasickAutomaton(AhoCorasickAutomaton<Letter> root)
     {
       Fail = root;
     }
 
-    public Trie() { }
+    public AhoCorasickAutomaton() { }
 
-    internal void AddNext(Letter letter, Trie<Letter> trie)
+    internal void AddNext(Letter letter, AhoCorasickAutomaton<Letter> trie)
     {
       Next ??= new();
       Next.Add(letter, trie);
     }
 
-    internal Trie<Letter> GetNext(Letter letter)
+    internal AhoCorasickAutomaton<Letter> GetNext(Letter letter)
     {
       if (Next != null && Next.TryGetValue(letter, out var next))
         return next;
@@ -39,7 +39,7 @@ namespace TryHards.AhoCorasick
         return null;
     }
 
-    internal IEnumerable<KeyValuePair<Letter, Trie<Letter>>> GetNextEdges()
+    internal IEnumerable<KeyValuePair<Letter, AhoCorasickAutomaton<Letter>>> GetNextEdges()
     {
       if (Next == null)
         yield break;
@@ -79,7 +79,7 @@ namespace TryHards.AhoCorasick
         if (next == null)
         {
           // This branch could be made faster as we now know that the remaining postfix is missing.
-          next = new Trie<Letter>(this);
+          next = new AhoCorasickAutomaton<Letter>(this);
           current.AddNext(letter, next);
         }
 
@@ -89,10 +89,10 @@ namespace TryHards.AhoCorasick
       current.AddOutput(word);
     }
 
-    internal Trie<Letter> FindNearestFailureLink(Letter letter)
+    internal AhoCorasickAutomaton<Letter> FindNearestFailureLink(Letter letter)
     {
       var failLink = Fail;
-      Trie<Letter> next;
+      AhoCorasickAutomaton<Letter> next;
       while ((next = failLink.GetNext(letter)) == null && !failLink.IsRoot)
         failLink = failLink.Fail;
 
@@ -101,7 +101,7 @@ namespace TryHards.AhoCorasick
 
     public void BuildAutomation()
     {
-      LinkedList<Trie<Letter>> queue = new LinkedList<Trie<Letter>>();
+      LinkedList<AhoCorasickAutomaton<Letter>> queue = new LinkedList<AhoCorasickAutomaton<Letter>>();
 
       foreach (var kvp in GetNextEdges())
         queue.AddLast(kvp.Value);
@@ -134,7 +134,7 @@ namespace TryHards.AhoCorasick
       {
         var letter = text.Span[i];
 
-        Trie<Letter> next;
+        AhoCorasickAutomaton<Letter> next;
         while ((next = current.GetNext(letter)) == null && !current.IsRoot)
           current = current.Fail;
 
