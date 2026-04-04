@@ -99,7 +99,7 @@ namespace TryHards.AhoCorasick
       return next;
     }
 
-    public void BuildAutomation()
+    public void BuildAutomaton()
     {
       LinkedList<AhoCorasickAutomaton<Letter>> queue = new LinkedList<AhoCorasickAutomaton<Letter>>();
 

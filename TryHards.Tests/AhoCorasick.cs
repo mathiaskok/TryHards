@@ -32,7 +32,7 @@ namespace TryHards.Tests
       foreach (var pattern in test.Patterns)
         trie.Insert(pattern.AsMemory());
 
-      trie.BuildAutomation();
+      trie.BuildAutomaton();
 
       var result = trie.FindAllMatches(test.Text.AsMemory()).ToList();
 
