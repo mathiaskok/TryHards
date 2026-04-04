@@ -81,8 +81,25 @@ namespace TryHards.Tests
           ],
           Matches =
           [
+            ("cart", true),
             ("car", true),
             ("care", true)
+          ]
+        };
+
+        yield return new TestSet
+        {
+          Patterns =
+          [
+            "test",
+            "team",
+            "toast"
+          ],
+          Matches =
+          [
+            ("test", true),
+            ("team", true),
+            ("toast", true)
           ]
         };
       }
