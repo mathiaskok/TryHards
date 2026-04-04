@@ -1,53 +1,45 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using TryHards.AhoCorasick;
 
 namespace TryHards.Radix
 {
   public class RadixTree<Letter>
   {
-    internal bool IsWord;
-    internal ReadOnlyMemory<Letter> Prefix;
-    internal Dictionary<Letter, RadixTree<Letter>> Edges;
+    internal RadixTreeNode<Letter> Root;
+    internal IEqualityComparer<Letter> Comparer;
 
-    internal RadixTree<Letter> GetEdge(Letter letter)
+    public RadixTree(
+      IEnumerable<ReadOnlyMemory<Letter>> words,
+      bool compact,
+      IEqualityComparer<Letter> comparer)
     {
-      if (Edges != null && Edges.TryGetValue(letter, out var next))
-        return next;
-      else
-        return null;
-    }
+      Comparer = comparer ?? EqualityComparer<Letter>.Default;
+      Root = new();
 
-    internal void InsertEdge(Letter letter, RadixTree<Letter> node)
-    {
-      Edges ??= new();
-      Edges[letter] = node;
-    }
-
-    internal RadixTree<Letter> AddEdge(ReadOnlyMemory<Letter> prefix)
-    {
-      RadixTree<Letter> next = new RadixTree<Letter>
+      if (words != null)
       {
-        Prefix = prefix
-      };
+        foreach (var word in words)
+          Insert(word);
+      }
 
-      InsertEdge(prefix.Span[0], next);
-      return next;
+      if (compact)
+        Compact();
     }
 
-    internal IEnumerable<KeyValuePair<Letter, RadixTree<Letter>>> EnumerateEdges()
-    {
-      if (Edges == null)
-        yield break;
+    public RadixTree(
+      IEnumerable<ReadOnlyMemory<Letter>> words,
+      bool compact)
+      : this(words, compact, null) { }
 
-      foreach (var kvp in Edges)
-        yield return kvp;
-    }
+    public RadixTree(IEqualityComparer<Letter> comparer)
+      : this(null, false, comparer) { }
+
+    public RadixTree()
+      : this(null) { }
 
     internal int CommonPrefixLength(ReadOnlyMemory<Letter> word1, ReadOnlyMemory<Letter> word2)
     {
-      return word1.Span.CommonPrefixLength(word2.Span);
+      return word1.Span.CommonPrefixLength(word2.Span, Comparer);
     }
 
     internal bool StartsWith(ReadOnlyMemory<Letter> full, ReadOnlyMemory<Letter> sub)
@@ -58,7 +50,7 @@ namespace TryHards.Radix
 
     public void Insert(ReadOnlyMemory<Letter> word)
     {
-      var current = this;
+      var current = Root;
       int i = 0;
       while (i < word.Length)
       {
@@ -68,7 +60,7 @@ namespace TryHards.Radix
 
         if (child == null)
         {
-          child = current.AddEdge(word[i..]);
+          child = current.AddEdge(word[i..], Comparer);
           child.IsWord = true;
           return;
         }
@@ -77,14 +69,14 @@ namespace TryHards.Radix
         int commonLen = CommonPrefixLength(word[i..], childPrefix);
         if (commonLen < childPrefix.Length)
         {
-          var newChild = new RadixTree<Letter>
+          var newChild = new RadixTreeNode<Letter>
           {
             Prefix = childPrefix[..commonLen]
           };
           child.Prefix = childPrefix[commonLen..];
 
-          newChild.InsertEdge(child.Prefix.Span[0], child);
-          current.InsertEdge(letter, newChild);
+          newChild.InsertEdge(child.Prefix.Span[0], child, Comparer);
+          current.InsertEdge(letter, newChild, Comparer);
           child = newChild;
         }
 
@@ -101,22 +93,12 @@ namespace TryHards.Radix
     /// If static string literals are dominant, then this will likely increase memory usage.
     /// Also only relevant is tree is expected to be long lived.
     /// </summary>
-    public void Compact()
-    {
-      if (Prefix.Length > 0)
-      {
-        var prefix = new Letter[Prefix.Length];
-        Prefix.Span.CopyTo(prefix.AsSpan());
-        Prefix = prefix;
-      }
+    public void Compact() =>
+      Root.Compact();
 
-      foreach (var edge in EnumerateEdges())
-        edge.Value.Compact();
-    }
-
-    public bool Contains(ReadOnlyMemory<Letter> text)
+    public bool ContainsKey(ReadOnlyMemory<Letter> text)
     {
-      var current = this;
+      var current = Root;
       int i = 0;
       while (i < text.Length)
       {
