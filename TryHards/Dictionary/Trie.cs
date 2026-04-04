@@ -45,7 +45,7 @@ namespace TryHards.Dictionary
       return current;
     }
 
-    public bool Contains(ReadOnlySpan<Letter> word)
+    public bool ContainsKey(ReadOnlySpan<Letter> word)
     {
       var node = FindWordLeafNode(word);
       return node != null && node.IsWord;
