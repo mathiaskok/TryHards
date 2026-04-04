@@ -1,32 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using NUnit.Framework;
 using NUnit.Framework.Internal;
 using TryHards.AhoCorasick;
 
 namespace TryHards.Tests
 {
-  public class TestSet
-  {
-    public string[] Patterns;
-    public string Text;
-    public (int, string)[] ExpectedOutput;
-
-    public override string ToString()
-    {
-      string patternString = string.Join(", ", Patterns.Select(p => $"\"{p}\""));
-      string textString = $"\"{Text}\"";
-      string outputString = string.Join(", ", ExpectedOutput.Select(o => $"({o.Item1}, \"{o.Item2}\")"));
-
-      return $"[{patternString}], {textString}, [{outputString}]";
-    }
-  }
-
   [TestFixture]
   public class AhoCorasick
   {
+    public class TestSet
+    {
+      public string[] Patterns;
+      public string Text;
+      public (int, string)[] ExpectedOutput;
+
+      public override string ToString()
+      {
+        string patternString = string.Join(", ", Patterns.Select(p => $"\"{p}\""));
+        string textString = $"\"{Text}\"";
+        string outputString = string.Join(", ", ExpectedOutput.Select(o => $"({o.Item1}, \"{o.Item2}\")"));
+
+        return $"[{patternString}], {textString}, [{outputString}]";
+      }
+    }
+
     public void TestBase(TestSet test)
     {
       Trie<char> trie = new();

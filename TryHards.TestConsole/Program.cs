@@ -1,4 +1,4 @@
-﻿using TryHards.AhoCorasick;
+﻿using TryHards.Radix;
 
 namespace TryHards.TestConsole
 {
@@ -6,19 +6,14 @@ namespace TryHards.TestConsole
   {
     static void Main(string[] args)
     {
-      Trie<char> trie = new Trie<char>();
-      trie.Insert("pin".AsMemory());
-      trie.Insert("apple".AsMemory());
-      trie.Insert("applepie".AsMemory());
+      RadixTree<char> tree = new();
+      tree.Insert("cart".AsMemory());
+      tree.Insert("car".AsMemory());
+      tree.Insert("care".AsMemory());
 
-      trie.BuildAutomation();
-
-      foreach (var match in trie.FindAllMatches("pineapplepie".AsMemory()))
-      {
-        System.Console.WriteLine(match.index);
-        System.Console.WriteLine(match.pattern.Span.ToString());
-        System.Console.WriteLine();
-      }
+      System.Console.WriteLine(tree.Contains("cart".AsMemory()));
+      System.Console.WriteLine(tree.Contains("car".AsMemory()));
+      System.Console.WriteLine(tree.Contains("care".AsMemory()));
     }
   }
 }
