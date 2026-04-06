@@ -13,6 +13,9 @@ jobs:
       contents: read
       packages: write
 
+    env:
+      PROJECT_PATH: ./TryHards/TryHards.csproj
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +44,7 @@ jobs:
 
       - name: Pack
         run: |
-          dotnet pack \
+          dotnet pack ${{ env.PROJECT_PATH }} \
             --configuration Release \
             --no-build \
             -p:PackageVersion=${{ env.VERSION }} \
