@@ -11,7 +11,7 @@ namespace TryHards.Deque
       for (int i = 0; i < Count; i++)
       {
         yield return _buffer[idx];
-        idx = (idx + 1 + Capacity) % Capacity;
+        idx = idx == (Capacity - 1) ? 0 : idx + 1;
       }
     }
 

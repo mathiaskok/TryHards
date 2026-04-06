@@ -61,22 +61,22 @@ namespace TryHards.Deque
 
     void IncrementFront()
     {
-      _front = (_front - 1 + Capacity) % Capacity;
+      _front = _front == 0 ? Capacity - 1 : _front - 1;
     }
 
     void DecrementFront()
     {
-      _front = (_front + 1 + Capacity) % Capacity;
+      _front = _front == (Capacity - 1) ? 0 : _front + 1;
     }
 
     void IncrementEnd()
     {
-     _end = (_end + 1 + Capacity) % Capacity;
+     _end = _end == (Capacity - 1) ? 0 : _end + 1;
     }
     
     void DecrementEnd()
     {
-      _end = (_end - 1 + Capacity) % Capacity;
+      _end = _end == 0 ? Capacity - 1 : _end - 1;
     }
 
     public void AddFront(T t)
