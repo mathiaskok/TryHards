@@ -1,4 +1,5 @@
 ﻿using TryHards.Radix;
+using TryHards.Suffix;
 
 namespace TryHards.TestConsole
 {
@@ -6,6 +7,12 @@ namespace TryHards.TestConsole
   {
     static void Main(string[] args)
     {
+      const string text = "banana";
+      SuffixArrayLcp<char> bananaStuff = new SuffixArrayLcp<char>(text.AsMemory());
+      var a = bananaStuff
+        .EnumerateSuffixes()
+        .Select(t => t.ToString())
+        .ToList();
     }
   }
 }
